@@ -28,13 +28,18 @@ if(NOT minhook_POPULATED)
     target_include_directories(minhook PUBLIC ${minhook_SOURCE_DIR}/include)
 endif()
 
-add_library(cslol-dll-legacy SHARED src/cslol-api.h src/cslol-dll-legacy.c)
-target_link_libraries(cslol-dll-legacy PRIVATE minhook)
+# Исправлено: правильное имя исходного файла и библиотеки
+add_library(cslol-dll SHARED src/cslol-api.h src/cslol-dll.c)
+target_link_libraries(cslol-dll PRIVATE minhook)
+target_include_directories(cslol-dll PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(cslol-inj src/cslol-inj.c)
-target_link_libraries(cslol-inj PRIVATE cslol-dll-legacy)
+target_link_libraries(cslol-inj PRIVATE cslol-dll)
 
+# Копируем заголовочный файл
 add_custom_command(TARGET cslol-inj
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/src/cslol-api.h" "$<TARGET_RUNTIME_DLL_DIRS:cslol-inj>/cslol-api.h"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/cslol-api.h" 
+        "$<TARGET_FILE_DIR:cslol-inj>/cslol-api.h"
 )
