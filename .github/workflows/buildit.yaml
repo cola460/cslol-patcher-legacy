@@ -27,18 +27,24 @@ jobs:
             -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ..
           cmake --build .
 
-          # ИСПРАВЛЕНО: проверяем правильное имя DLL
-          if [ ! -f cslol-dll-legacy.dll ]; then
-            echo "ERROR: cslol-dll-legacy.dll не найден!"
+          # Проверяем, что DLL создался
+          if [ ! -f cslol-dll.dll ]; then
+            echo "ERROR: cslol-dll.dll не найден!"
             exit 1
           fi
+          
+          echo "✅ DLL успешно создан!"
         shell: bash
 
       - name: "Package DLL"
         run: |
-          # ИСПРАВЛЕНО: используем правильное имя файла
-          7z a cslol-patcher.zip build/cslol-dll-legacy.dll
+          # Создаем ZIP архив с DLL файлом
+          7z a cslol-patcher.zip build/cslol-dll.dll
+          
+          # Переименовываем папку внутри архива (делаем красивую структуру)
           7z rn cslol-patcher.zip build/ cslol-patcher/
+          
+          echo "✅ ZIP архив создан!"
         shell: bash
 
       - name: "Upload Artifact"
