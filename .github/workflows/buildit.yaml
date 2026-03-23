@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: windows-2022
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # теперь применимо ко всему job
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # включаем Node.js 24
 
     steps:
       - name: "Clone source"
@@ -17,9 +17,9 @@ jobs:
       - name: "Setup MSVC"
         uses: ilammy/msvc-dev-cmd@v2
 
-      - name: "Build"
+      - name: "Build DLL"
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake -G "NMake Makefiles" \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -27,7 +27,14 @@ jobs:
             -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ..
           cmake --build .
 
-      - name: "Package"
+          # Проверяем, что DLL реально существует
+          if [ ! -f cslol-dll.dll ]; then
+            echo "ERROR: cslol-dll.dll не найден!"
+            exit 1
+          fi
+        shell: bash
+
+      - name: "Package DLL"
         run: |
           7z a cslol-patcher.zip build/cslol-*
           7z rn cslol-patcher.zip build/ cslol-patcher/
