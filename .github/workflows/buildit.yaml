@@ -6,16 +6,22 @@ jobs:
   build:
     runs-on: windows-2022
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # включаем Node.js 24
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # включаем Node.js 24 для всех шагов
 
     steps:
       - name: "Clone source"
         uses: actions/checkout@v3
         with:
           submodules: true
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: "Setup MSVC"
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: "Build DLL"
         run: |
@@ -33,12 +39,16 @@ jobs:
             exit 1
           fi
         shell: bash
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: "Package DLL"
         run: |
           7z a cslol-patcher.zip build/cslol-*
           7z rn cslol-patcher.zip build/ cslol-patcher/
         shell: bash
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
@@ -46,3 +56,5 @@ jobs:
           name: cslol-patcher
           path: cslol-patcher.zip
           retention-days: 15
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
