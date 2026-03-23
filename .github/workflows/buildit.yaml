@@ -6,8 +6,7 @@ jobs:
   build:
     runs-on: windows-2022
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # разрешаем старым actions работать на Node.js 20
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # оставляем только эту переменную для Node.js 20
 
     steps:
       - name: "Clone source"
@@ -16,9 +15,7 @@ jobs:
           submodules: true
 
       - name: "Setup MSVC"
-        uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: "Build DLL"
         run: |
@@ -30,7 +27,6 @@ jobs:
             -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ..
           cmake --build .
 
-          # Проверяем, что DLL реально существует
           if [ ! -f cslol-dll.dll ]; then
             echo "ERROR: cslol-dll.dll не найден!"
             exit 1
