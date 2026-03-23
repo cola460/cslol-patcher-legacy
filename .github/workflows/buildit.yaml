@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: windows-2022
     env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # оставляем только эту переменную для Node.js 20
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: "Clone source"
@@ -27,15 +27,17 @@ jobs:
             -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ..
           cmake --build .
 
-          if [ ! -f cslol-dll.dll ]; then
-            echo "ERROR: cslol-dll.dll не найден!"
+          # ИСПРАВЛЕНО: проверяем правильное имя DLL
+          if [ ! -f cslol-dll-legacy.dll ]; then
+            echo "ERROR: cslol-dll-legacy.dll не найден!"
             exit 1
           fi
         shell: bash
 
       - name: "Package DLL"
         run: |
-          7z a cslol-patcher.zip build/cslol-*
+          # ИСПРАВЛЕНО: используем правильное имя файла
+          7z a cslol-patcher.zip build/cslol-dll-legacy.dll
           7z rn cslol-patcher.zip build/ cslol-patcher/
         shell: bash
 
